@@ -1,5 +1,5 @@
 import cleanStack from 'clean-stack';
-import {inspect} from "util";
+import { inspect } from "node:util";
 //import safeStringify from '@sindresorhus/safe-stringify';
 
 export const stack = (error: Error) => {
@@ -17,5 +17,5 @@ export const render = (m: any): string => {
   if (typeof m === `string`) return m;
   if (typeof m === `object`) return inspect(m);
   if (typeof m === `undefined`) return `(undefined)`;
-  return '' + m;
+  return `` + m;
 }

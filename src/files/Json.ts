@@ -1,14 +1,5 @@
-import {fileURLToPath} from 'url';
-import {resolve} from 'node:path';
-import {writeFile, readFile} from 'fs/promises';
+import {readFile, writeFile} from "node:fs/promises"
 import {existsSync} from 'fs';
-
-export const pathResolver = (offset: string = '') => {
-  const __dirname = fileURLToPath(new URL('.', import.meta.url));
-  return (relativePath: string) => {
-    return resolve(__dirname, offset, relativePath);
-  }
-}
 
 export enum WriteMode {
   Overwrite,

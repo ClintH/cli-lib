@@ -1,6 +1,4 @@
-node_modules
-yarn.lock
-coverage
-.nyc_output
+node_modules/
+.eslintcache
+.env
 dist
-*.0x

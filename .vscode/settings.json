@@ -1,0 +1,42 @@
+{
+  "files.eol": "\n",
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/etc": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/docs": true
+  },
+  "javascript.preferences.importModuleSpecifierEnding": "js",
+  "typescript.preferences.importModuleSpecifierEnding": "js",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
+  "eslint.codeActionsOnSave.mode": "problems",
+  "eslint.format.enable": false,
+  "eslint.lintTask.enable": true,
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "[javascript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "editor.formatOnPaste": false,
+  "editor.formatOnSave": true,
+  "editor.formatOnType": false,
+  "editor.formatOnSaveMode": "file",
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
+  "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
+  "typescript.format.insertSpaceAfterKeywordsInControlFlowStatements": true,
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": true,
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": true,
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": false,
+  "typescript.format.insertSpaceAfterCommaDelimiter": true,
+  "typescript.format.insertSpaceAfterSemicolonInForStatements": true,
+  "typescript.format.insertSpaceAfterTypeAssertion": true,
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true
+}
