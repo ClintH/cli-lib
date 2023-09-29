@@ -1,7 +1,8 @@
-import Logger from './Log.js';
+import { IBaseArguments, parseArguments } from './Args.js';
+import { Log } from './Log.js';
 import { Term } from './Term.js';
 import exitHook from 'exit-hook';
-export * from './Log.js';
+import { App, InitOptions } from './Types.js';
 export * from './Term.js';
 export * as Json from './files/Json.js';
 export * as Arrays from './Arrays.js';
@@ -12,26 +13,25 @@ export * from './Progress.js';
 export * as Time from './Time.js';
 export * as Debug from './Debug.js';
 
-export type App = Readonly<{
-  onExit?(signal: number): void;
-  logPrefix?: string
-}>
+export function init<Args>(initOptions: Partial<InitOptions<Args>> = {}): App<Args> {
+  const logPrefix = initOptions.logPrefix ?? ``;
+  const log = new Log({ prefix: logPrefix });
+  const term = new Term(log, initOptions.terminal ?? {});
 
-export type Init = Readonly<{
-  log: Logger,
-  term: Term
-}>
+  const args = parseArguments<Args>(initOptions.args);
+  if (args.log.length) log.setOutputFile(args.log, false);
+  if (args.verbose) log.verboseMode = true;
 
-export function init(app: App = {}): Init {
-  const logPrefix = app.logPrefix ?? ``;
-  const log = new Logger({ prefix: logPrefix });
-  const term = new Term(log);
   exitHook(signal => {
-    if (app.onExit) app.onExit(signal);
-    log.close();
+    if (initOptions.onExit) initOptions.onExit(signal);
+    log.closeFile();
   })
 
+  const quit = (signal: number = 0) => {
+    process.exit(signal);
+  }
+
   return {
-    log, term
+    log, term, quit, args
   }
 }

@@ -1,5 +1,9 @@
 import { numberToString, remainder, singleOrPlural } from "./Math.js";
 
+export async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export const humanElapsed = (value: number, detailed = false) => {
   if (value < 1000) {
     return singleOrPlural(value, `ms`, `ms`);

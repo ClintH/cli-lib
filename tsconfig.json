@@ -1,12 +1,14 @@
 {
   "compilerOptions": {
     "rootDir": "src",
+    "baseUrl": "src/",
     "outDir": "dist",
     "target": "ES2022",
     "lib": [
       "ES2022"
     ],
     "module": "NodeNext",
+    "declaration": true,
     "sourceMap": true,
     "moduleResolution": "NodeNext",
     "esModuleInterop": true,

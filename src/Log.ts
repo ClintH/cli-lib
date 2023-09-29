@@ -1,126 +1,120 @@
-/* eslint-disable @typescript-eslint/unbound-method */
-import kleur from "kleur";
 import { open, FileHandle } from "node:fs/promises";
-import { render } from "./Debug.js";
+import { ILog, LogListener, LogMessage, LogOptions, RawConsole } from "./Types.js";
 
 
-export type LogOptions = {
-  verbose: boolean
-  prefix: string
-  timestamp: boolean
-}
-
-export default class Logger {
-  verboseEnable = false;
-  prefix: string;
-  timestamp: boolean;
-  file?: FileHandle;
-  _log;
-  _error;
-  _warn;
+export class Log implements ILog {
+  private _verbose = false;
+  private _prefix: string | undefined;
+  private _file?: FileHandle;
+  private _listeners: Array<LogListener> = [];
+  private _logRaw;
+  private _errorRaw;
+  private _warnRaw;
+  private _infoRaw;
 
   constructor(options: Partial<LogOptions> = {}) {
-    this._log = console.log;
-    this._error = console.error;
-    this._warn = console.warn;
+    this._logRaw = console.log;
+    this._errorRaw = console.error;
+    this._warnRaw = console.warn;
+    this._infoRaw = console.info;
 
-    this.prefix = options.prefix ?? ``;
-    this.verboseEnable = options.verbose ?? false;
-    this.timestamp = options.timestamp ?? false;
+    this._verbose = options.verbose ?? false;
+    this._prefix = options.prefix;
 
-    this.prefix = this.prefix.length > 0 ? this.prefix + ` ` : ` · `;
+    console.log = (message?: any, ...optionalParameters: Array<any>) => {
+      this.log({
+        type: ``,
+        message,
+        parameters: optionalParameters
+      });
+    }
+    console.info = (message?: any, ...optionalParameters: Array<any>) => {
+      this.log({
+        type: `info`,
+        message,
+        parameters: optionalParameters
+      });
+    }
+    console.error = (message?: any, ...optionalParameters: Array<any>) => {
+      this.log({
+        type: `error`,
+        message,
+        parameters: optionalParameters
+      })
+    };
+    console.warn = (message?: any, ...optionalParameters: Array<any>) => {
+      this.log({
+        type: `warning`,
+        message,
+        parameters: optionalParameters
+      })
+    };
+  }
 
-    console.log = this.info;
-    console.error = this.error;
-    console.warn = this.warn;
+  getRawConsole(): RawConsole {
+    return {
+      log: this._logRaw,
+      error: this._errorRaw,
+      info: this._infoRaw,
+      warn: this._warnRaw
+    };
+  }
 
+
+  get verboseMode() {
+    return this._verbose;
+  }
+
+  set verboseMode(v: boolean) {
+    this._verbose = v;
+  }
+
+  addListener(listener: LogListener) {
+    this._listeners.push(listener);
+  }
+
+  log(message: LogMessage) {
+    if (message.type === `info` && !this._verbose) return;
+    let handled = false;
+    for (const l of this._listeners) {
+      handled = l(message) || handled;
+    }
+
+    const text = this._prefix ? this._prefix + ' ' + message.message : message.message;
+    if (!handled) {
+      switch (message.type) {
+        case `error`:
+          this._errorRaw(text, ...message.parameters);
+          break;
+        case `warning`:
+          this._warnRaw(text, ...message.parameters);
+        default:
+          this._logRaw(text, ...message.parameters);
+      }
+    }
+
+    this.writeFileLine(message.type + '\t' + text + ' ' + message.parameters);
   }
 
   async setOutputFile(file: string, append: boolean) {
-    if (this.file) {
-      await this.close();
+    if (this._file) {
+      await this.closeFile();
     }
     const flag = append ? `a` : `w`
-    this.file = await open(file, flag);
+    this._file = await open(file, flag);
     if (append) await this.writeFileLine(`--- Opened --- `);
   }
 
-  async writeFileLine(line: string) {
-    if (!this.file) return;
+  private async writeFileLine(line: string) {
+    if (!this._file) return;
     const ts = new Date().toISOString();
-    await this.file.write(ts + ` ` + line + `\n`);
+    await this._file.write(ts + ` ` + line + `\n`);
   }
 
-  async close() {
-    if (!this.file) return;
+  async closeFile() {
+    if (!this._file) return;
     await this.writeFileLine(`--- Closed ---`);
-    await this.file.close();
-    this.file = undefined;
+    await this._file.close();
+    this._file = undefined;
   }
-
-  initFromArgs() {
-    // @ts-expect-error
-    this.verboseEnable = globalThis.args.verbose || false;
-  }
-
-
-  getLinePrefix() {
-    if (this.timestamp) {
-      const now = Date.now();
-      return kleur.gray(now)
-    } else {
-      return ``;
-    }
-  }
-
-  info(message?: any, ...optionalParameters: Array<any>) {
-    let bit = kleur.white(this.prefix) + message;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (message.length > 0 && Number.parseInt(message[ 0 ]!) && message[ 1 ] === `.` && message[ 2 ] === ` `) {
-      // Assume a numbered list
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      bit = kleur.bold().white(message.slice(0, 2)) + message.slice(2);
-    }
-
-    const bits = this.optParams(optionalParameters);
-    this._log(this.getLinePrefix() + bit + bits.fancy.join(` `));
-    void this.writeFileLine(`INFO\t` + message + ` ` + bits.plain.join(` `));
-  }
-
-  private optParams(optionalParameters: Array<any>): { fancy: Array<string>, plain: Array<string> } {
-    if (optionalParameters.length > 0) {
-      const plain = optionalParameters.map(p => render(p));
-      const fancy = plain.map(p => kleur.gray(p));
-      return { fancy, plain };
-    }
-    return { fancy: [], plain: [] };
-  }
-
-  verbose(message?: any, ...optionalParameters: Array<any>) {
-    if (!this.verboseEnable) return;
-    this.info(message, ...optionalParameters);
-  }
-
-  error(message?: any, ...optionalParameters: Array<any>) {
-    if (message instanceof Error) {
-      this.errorString(message.message, ...optionalParameters);
-    } else {
-      this.errorString(message as string, ...optionalParameters);
-    }
-  }
-
-  errorString(message: string, ...optionalParameters: Array<any>) {
-    const bits = this.optParams(optionalParameters);
-    const bit = kleur.bold(kleur.red().bgBlack(this.prefix + `Error `)) + message;
-    this._log(bit + bits.fancy.join(` `));
-    void this.writeFileLine(`ERROR\t` + message + ` ` + bits.plain.join(` `));
-  }
-
-  warn(message?: any, ...optionalParameters: Array<any>) {
-    const bits = this.optParams(optionalParameters);
-    const bit = kleur.bold(kleur.magenta().bgBlack(this.prefix + `Warn `)) + message;
-    this._log(bit + bits.fancy.join(` `));
-    void this.writeFileLine(`WARN\t` + message + ` ` + bits.plain.join(` `));
-  }
-
 }
