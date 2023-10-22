@@ -80,20 +80,24 @@ export class Log implements ILog {
       handled = l(message) || handled;
     }
 
-    const text = this._prefix ? this._prefix + ' ' + message.message : message.message;
+    const text = this._prefix ? this._prefix + ` ` + message.message : message.message;
     if (!handled) {
       switch (message.type) {
-        case `error`:
-          this._errorRaw(text, ...message.parameters);
+        case `error`: {
+          this._errorRaw(text, ...(message.parameters ?? []));
           break;
-        case `warning`:
-          this._warnRaw(text, ...message.parameters);
-        default:
-          this._logRaw(text, ...message.parameters);
+        }
+        case `warning`: {
+          this._warnRaw(text, ...(message.parameters ?? []));
+        }
+        default: {
+          this._logRaw(text, ...(message.parameters ?? []));
+        }
       }
     }
 
-    this.writeFileLine(message.type + '\t' + text + ' ' + message.parameters);
+    const parameters = message.parameters === undefined ? `` : ` ` + JSON.stringify(message.parameters);
+    void this.writeFileLine(message.type + `\t` + text + parameters);
   }
 
   async setOutputFile(file: string, append: boolean) {

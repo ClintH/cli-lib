@@ -10,6 +10,7 @@ export type ProgessOptions = {
   whenDoneShowElapsed: boolean,
   name: string
 }
+
 export const progress = (total: number, options: Partial<ProgessOptions> = {}) => {
   let count = 0;
   const whenDoneShowElapsed = options.whenDoneShowElapsed ?? true;
@@ -25,7 +26,22 @@ export const progress = (total: number, options: Partial<ProgessOptions> = {}) =
 
   let prefix = ``;
   if (name) {
-    prefix = kleur.white(name) + ' ';
+    prefix = kleur.white(name) + ` `;
+  }
+
+  const error = (message: any) => {
+    logUpdate.done();
+    console.error(message);
+  }
+
+  const warn = (message: any) => {
+    logUpdate.done();
+    console.warn(message);
+  }
+
+  const log = (message: any) => {
+    logUpdate.done();
+    console.log(message);
   }
 
   const cancel = (message = `Cancelled`) => {
@@ -38,7 +54,7 @@ export const progress = (total: number, options: Partial<ProgessOptions> = {}) =
   const done = (message = ``) => {
     if (_cancelled || _finished) return;
     _finished = true;
-    if (message.length > 0) message += ' ';
+    if (message.length > 0) message += ` `;
     if (whenDoneShowElapsed) {
       logUpdate(`${ prefix }Complete. ${ message }(${ total } in ${ humanElapsed(elapsedTime(), false) })`);
     } else {
@@ -47,7 +63,7 @@ export const progress = (total: number, options: Partial<ProgessOptions> = {}) =
     logUpdate.done();
   }
 
-  const update = (suffix = ``) => {
+  const update = (suffix = ``,) => {
     if (_cancelled || _finished) return;
     count++;
     if (count > total) return;
@@ -69,5 +85,5 @@ export const progress = (total: number, options: Partial<ProgessOptions> = {}) =
     }
   }
 
-  return { update, done, cancel }
+  return { update, done, cancel, error, warn, log }
 }

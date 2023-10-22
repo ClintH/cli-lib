@@ -1,4 +1,4 @@
-import { IBaseArguments, parseArguments } from './Args.js';
+import { Commands, IBaseArguments, parseArguments } from './Arguments.js';
 import { Log } from './Log.js';
 import { Term } from './Term.js';
 import exitHook from 'exit-hook';
@@ -12,26 +12,39 @@ export * as Maths from './Math.js';
 export * from './Progress.js';
 export * as Time from './Time.js';
 export * as Debug from './Debug.js';
+export * as Text from './Text.js';
+export { App } from './App.js';
+export { Commands, Command } from './Arguments.js';
+export type { InitOptions, LogListener, LogMessage, LogTypes, LogOptions } from './Types.js'
+// export function init<TArguments>(initOptions: Partial<InitOptions> = {}): App<TArguments> {
+//  const args = parseArguments<TArguments>(initOptions.args);
+// const args = parseCommand<TArguments>(options.args);
+// if (args.log.length > 0) void log.setOutputFile(args.log, false);
+// if (args.verbose) log.verboseMode = true;
 
-export function init<Args>(initOptions: Partial<InitOptions<Args>> = {}): App<Args> {
-  const logPrefix = initOptions.logPrefix ?? ``;
-  const log = new Log({ prefix: logPrefix });
-  const term = new Term(log, initOptions.terminal ?? {});
+// exitHook(signal => {
+//   if (initOptions.onExit) initOptions.onExit(signal);
+//   void log.closeFile();
+// })
 
-  const args = parseArguments<Args>(initOptions.args);
-  if (args.log.length) log.setOutputFile(args.log, false);
-  if (args.verbose) log.verboseMode = true;
+// const quit = (signal = 0) => {
+//   // eslint-disable-next-line unicorn/no-process-exit
+//   process.exit(signal);
+// }
 
-  exitHook(signal => {
-    if (initOptions.onExit) initOptions.onExit(signal);
-    log.closeFile();
-  })
+// return {
+//   log, term, quit, args
+// }
+// }
 
-  const quit = (signal: number = 0) => {
-    process.exit(signal);
-  }
+// function initCommon() {
 
-  return {
-    log, term, quit, args
-  }
-}
+// }
+
+// export function initCommand<TCommands>(options: Partial<InitOptions>, commands: Commands<TCommands>) {
+//   const logPrefix = options.logPrefix ?? ``;
+//   const log = new Log({ prefix: logPrefix });
+//   const term = new Term(log, options.terminal ?? {});
+
+//   parseCommand<TCommands>(commands);
+// }
