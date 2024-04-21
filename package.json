@@ -1,6 +1,6 @@
 {
   "name": "@clinth/cli-lib",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "type": "module",
   "exports": {
@@ -25,22 +25,22 @@
   "license": "ISC",
   "devDependencies": {
     "@ava/typescript": "^4.1.0",
-    "@types/node": "^20.7.1",
-    "@typescript-eslint/eslint-plugin": "^6.7.3",
-    "@typescript-eslint/parser": "^6.7.3",
-    "ava": "^5.3.1",
+    "@types/node": "^20.12.7",
+    "@typescript-eslint/eslint-plugin": "^7.7.0",
+    "@typescript-eslint/parser": "^7.7.0",
+    "ava": "^6.1.2",
     "boxen": "^7.1.1",
-    "eslint": "^8.50.0",
-    "eslint-plugin-unicorn": "^48.0.1",
+    "eslint": "^9.1.0",
+    "eslint-plugin-unicorn": "^52.0.0",
     "exit-hook": "^4.0.0",
     "rimraf": "^5.0.5",
-    "tsx": "^3.13.0",
-    "typescript": "^5.2.2"
+    "tsx": "^4.7.2",
+    "typescript": "^5.4.4"
   },
   "ava": {
     "typescript": {
       "rewritePaths": {
-        "src/":"dist/"
+        "src/": "dist/"
       },
       "compile": false
     },
@@ -50,7 +50,7 @@
   },
   "dependencies": {
     "kleur": "^4.1.5",
-    "log-update": "^5.0.1",
+    "log-update": "^6.0.0",
     "ts-command-line-args": "^2.5.1"
   }
 }

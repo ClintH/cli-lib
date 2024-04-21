@@ -3,21 +3,35 @@ import { incrementThrough } from "./Arrays.js";
 import { humanElapsed } from "./Time.js";
 import logUpdate from 'log-update'
 
-const spinner = [ `-`, `\\`, `|`, `/`, `-`, `\\`, `|`, `/` ];
+const spinnerLines = [ `-`, `\\`, `|`, `/`, `-`, `\\`, `|`, `/` ] as const;
 
 export type ProgessOptions = {
-  spinner: `lines` | `none`,
-  whenDoneShowElapsed: boolean,
+  /**
+   * Kind of spinner.
+   * Default: 'lines'
+   */
+  spinner: `lines` | `none`
+  /**
+   * Show elapsed time when done
+   * Default: _true_
+   */
+  whenDoneShowElapsed: boolean
   name: string
+  /**
+   * Minimum time before console updates
+   * Default: 200
+   */
+  updateThresholdMs: number
 }
 
 export const progress = (total: number, options: Partial<ProgessOptions> = {}) => {
   let count = 0;
   const whenDoneShowElapsed = options.whenDoneShowElapsed ?? true;
+  const updateThresholdMs = options.updateThresholdMs ?? 200;
+  const spinner = options.spinner ?? `lines`;
   const startTime = Date.now();
-  const spinnerLoop = incrementThrough(spinner);
+  const spinnerLoop = spinner === `none` ? () => `` : incrementThrough(spinnerLines);
   const sinceLastUpdate = startTime;
-  const updateThresholdMs = 200;
   const name = options.name;
 
   const elapsedTime = () => Date.now() - startTime;
