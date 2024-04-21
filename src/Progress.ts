@@ -7,6 +7,11 @@ const spinnerLines = [ `-`, `\\`, `|`, `/`, `-`, `\\`, `|`, `/` ] as const;
 
 export type ProgessOptions = {
   /**
+   * Text to prefix before each line
+   */
+  termPrefix: string
+  autoComplete: boolean
+  /**
    * Kind of spinner.
    * Default: 'lines'
    */
@@ -28,8 +33,11 @@ export const progress = (total: number, options: Partial<ProgessOptions> = {}) =
   let count = 0;
   const whenDoneShowElapsed = options.whenDoneShowElapsed ?? true;
   const updateThresholdMs = options.updateThresholdMs ?? 200;
+  const autoComplete = options.autoComplete ?? true;
+  const termPrefix = options.termPrefix ?? ``;
   const spinner = options.spinner ?? `lines`;
   const startTime = Date.now();
+
   const spinnerLoop = spinner === `none` ? () => `` : incrementThrough(spinnerLines);
   const sinceLastUpdate = startTime;
   const name = options.name;
@@ -42,7 +50,9 @@ export const progress = (total: number, options: Partial<ProgessOptions> = {}) =
   if (name) {
     prefix = kleur.white(name) + ` `;
   }
-
+  if (termPrefix) {
+    prefix = termPrefix + prefix;
+  }
   const error = (message: any) => {
     logUpdate.done();
     console.error(message);
@@ -70,9 +80,9 @@ export const progress = (total: number, options: Partial<ProgessOptions> = {}) =
     _finished = true;
     if (message.length > 0) message += ` `;
     if (whenDoneShowElapsed) {
-      logUpdate(`${ prefix }Complete. ${ message }(${ total } in ${ humanElapsed(elapsedTime(), false) })`);
+      logUpdate(`${ prefix }✔️ ${ message }(${ total } in ${ humanElapsed(elapsedTime(), false) })`);
     } else {
-      logUpdate(`${ prefix }Complete. ${ message }`);
+      logUpdate(`${ prefix }✔️ ${ message }`);
     }
     logUpdate.done();
   }
@@ -94,7 +104,7 @@ export const progress = (total: number, options: Partial<ProgessOptions> = {}) =
       const humanElapsedValue = humanElapsed(elapsed, true);
       logUpdate(`${ prefix }${ spinnerLoop() } ${ humanPercent }% ${ count }/${ total } ${ humanElapsedValue } ${ suffix }`);
     }
-    if (percentage === 1) {
+    if (percentage === 1 && autoComplete) {
       done(suffix);
     }
   }
