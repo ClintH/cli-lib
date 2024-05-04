@@ -3,11 +3,14 @@ import { readdir } from 'node:fs/promises';
 import { isAbsolute, join, resolve } from 'node:path';
 import { CrawlOptions } from './Types.js';
 
-
-export async function* crawl(basePath: string, opts: CrawlOptions = {}): AsyncIterableIterator<Dirent> {
+export async function* crawl(basePath: string, opts: CrawlOptions = {}, depth = 0): AsyncIterableIterator<Dirent> {
   const ignoreExtensions = opts.ignoreExtensions ?? [];
   const includeExtensions = opts.includeExtensions ?? [];
   const ignoreDirectories = opts.ignoreDirectories ?? false;
+  const maximumDepth = opts.maximumDepth ?? Number.MAX_SAFE_INTEGER;
+
+  // Maximum depth reached
+  if (depth > maximumDepth) return;
 
   if (!isAbsolute(basePath)) basePath = resolve(process.cwd(), basePath);
 
@@ -32,7 +35,7 @@ export async function* crawl(basePath: string, opts: CrawlOptions = {}): AsyncIt
     entry.path = basePath;
     if (entry.isDirectory()) {
       if (!ignoreDirectories) yield entry;
-      yield* crawl(join(basePath, entry.name), opts);
+      yield* crawl(join(basePath, entry.name), opts, depth + 1);
     } else {
       if (!includeExtension(entry)) continue;
       yield entry;

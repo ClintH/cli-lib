@@ -1,5 +1,5 @@
 import { ArgumentConfig } from "ts-command-line-args"
-import { IBaseArguments } from "./Arguments.js"
+import { Commands, IBaseArguments } from "./Arguments.js"
 import { Term, TermOptions } from "./Term.js"
 export type LogTypes = `` | `info` | `error` | `warning`;
 export type LogMessage = {
@@ -42,17 +42,20 @@ export interface ILog {
   get verboseMode(): boolean
   set verboseMode(value: boolean)
   addListener(listener: LogListener): void
+  removeListener(listener: LogListener): void
 }
 
 export type InitOptions = Readonly<{
+  commands: Commands<any>
   onExit(signal: number): void
   logPrefix: string
   terminal?: Partial<TermOptions>
 }>
 
-export type App<TArguments> = Readonly<{
-  log: ILog,
-  args: TArguments & IBaseArguments,
-  term: Term,
-  quit: (signal?: number) => void
-}>
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+// export interface IApp<TArguments> {
+//   log: ILog,
+//   args: TArguments & IBaseArguments,
+//   term: Term,
+//   quit: (signal?: number) => void
+// }

@@ -2,7 +2,7 @@ import boxen from 'boxen';
 import { readFileSync } from "node:fs";
 import kleur from "kleur";
 import { locatePackageJson } from './files/PackageJson.js';
-import { ILog, InitOptions, LogMessage, LogOptions, rawConsoleDefault, type RawConsole } from './Types.js';
+import { ILog, LogMessage, rawConsoleDefault, type RawConsole } from './Types.js';
 import * as Debug from './Debug.js';
 
 export type TermTypePrefixStyles = `character` | `word` | `none`;
@@ -16,27 +16,44 @@ export type TermOptions = {
 export class Term {
   static _instance: Term | undefined;
 
-  private _con: RawConsole;
+  private _con: RawConsole | undefined;
   private _log: ILog | undefined;
   private _prefix?: string;
   private _alignLeft: boolean;
   private _prefixStyle: TermTypePrefixStyles;
+  private _closed = false;
+
+  private _onLogMessage;
 
   private constructor() {
     this._con = rawConsoleDefault();
     this._alignLeft = false;
     this._prefixStyle = `character`;
     this._log = undefined;
+    this._onLogMessage = (message: LogMessage) => this.onLogMessage(message);
+
   }
 
-  setLog(log: ILog) {
+  setLog(log: ILog | undefined) {
+    if (this._log !== undefined) {
+      this._log.removeListener(this._onLogMessage);
+      this._con = rawConsoleDefault();
+    }
     this._log = log;
-    this._con = log.getRawConsole();
-    this._log.addListener(message => this.onLogMessage(message));
 
+    if (this._log) {
+      this._log.addListener(this._onLogMessage);
+      this._con = this._log.getRawConsole();
+    }
   }
 
-  configure(options: TermOptions) {
+  close() {
+    this._closed = true;
+  }
+
+  configure(options: Partial<TermOptions>) {
+    if (this._closed) throw new Error(`Term closed`);
+
     this._alignLeft = options.alignLeft ?? false;
     this._prefixStyle = options.prefixStyle ?? `character`;
 
@@ -57,6 +74,8 @@ export class Term {
   }
 
   printError(error: Error) {
+    if (this._closed) throw new Error(`Term closed`);
+
     const stack = Debug.stack(error);
     if (!stack) return;
     this.raw(boxen(stack, {
@@ -72,14 +91,20 @@ export class Term {
   }
 
   log(message: any) {
+    if (this._closed) throw new Error(`Term closed`);
+
     this.onLogMessage({ message, type: `` });
   }
 
   error(message: any) {
+    if (this._closed) throw new Error(`Term closed`);
+
     this.onLogMessage({ message, type: `error` });
   }
 
   private onLogMessage(logMessage: LogMessage): boolean {
+    if (this._closed) throw new Error(`Term closed`);
+
     let prefix = this._prefix ? kleur.white(this._prefix) : ``;
 
     let message = logMessage.message;
@@ -123,6 +148,8 @@ export class Term {
   }
 
   box = (message: string) => {
+    if (this._closed) throw new Error(`Term closed`);
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     this.raw(boxen(message, {
       padding: 1
@@ -131,6 +158,8 @@ export class Term {
 
 
   header(message: string) {
+    if (this._closed) throw new Error(`Term closed`);
+
     const bit = kleur.blue().underline(message);
     this.raw();
     this.raw(bit);
@@ -138,6 +167,8 @@ export class Term {
   }
 
   appHeader() {
+    if (this._closed) throw new Error(`Term closed`);
+
     let version = `?`;
     let name = `app`;
     let description = ``;
@@ -149,8 +180,8 @@ export class Term {
       version = json.version;
       description = json.description;
     } catch (error) {
-      this._con.error(`Could not load package.json`);
-      this._con.error(error);
+      this._con?.error(`Could not load package.json`);
+      this._con?.error(error);
       // eslint-disable-next-line unicorn/no-process-exit
       process.exit(1);
     }
@@ -164,6 +195,7 @@ export class Term {
   }
 
   separator() {
+
     this.raw();
     this.raw(kleur.cyan(kleur.bold(`-----`)));
     this.raw();
@@ -171,14 +203,18 @@ export class Term {
 
 
   raw(message?: any, ...optionalParameters: Array<any>) {
+    if (this._closed) throw new Error(`Term closed`);
+
     if (message === undefined) {
-      this._con.log();
+      this._con?.log();
       return;
     }
-    this._con.log(message, ...optionalParameters);
+    this._con?.log(message, ...optionalParameters);
   }
 
   emphasis(message: string) {
+    if (this._closed) throw new Error(`Term closed`);
+
     const messageLines = message.split(`\n`);
     for (const m of messageLines) {
       const txt = m.trim();
@@ -187,6 +223,8 @@ export class Term {
   }
 
   write(message: string) {
+    if (this._closed) throw new Error(`Term closed`);
+
     this.raw(message);
   }
 

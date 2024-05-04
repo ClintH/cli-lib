@@ -1,7 +1,6 @@
 import { open, FileHandle } from "node:fs/promises";
 import { ILog, LogListener, LogMessage, LogOptions, RawConsole } from "./Types.js";
 
-
 export class Log implements ILog {
   private _verbose = false;
   private _prefix: string | undefined;
@@ -60,7 +59,6 @@ export class Log implements ILog {
     };
   }
 
-
   get verboseMode() {
     return this._verbose;
   }
@@ -71,6 +69,10 @@ export class Log implements ILog {
 
   addListener(listener: LogListener) {
     this._listeners.push(listener);
+  }
+
+  removeListener(listener: LogListener) {
+    this._listeners = this._listeners.filter(l => l !== listener);
   }
 
   log(message: LogMessage) {

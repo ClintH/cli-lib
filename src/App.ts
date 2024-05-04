@@ -1,29 +1,48 @@
 import { Commands } from "./Arguments.js";
 import { Term } from "./Term.js";
-import { ArgumentConfig, parse } from 'ts-command-line-args';
+import { parse } from 'ts-command-line-args';
+import * as exitHook from 'exit-hook';
+import { InitOptions } from "Types.js";
 
 export class App {
   static _instance: App | undefined = undefined;
-
   term;
+  #opts: InitOptions | undefined;
 
   private constructor() {
     this.term = Term.instance;
   }
 
-  initWithCommands<T>(commands: Commands<T>) {
-    console.log(process.argv);
-    this.term.appHeader();
+  quit(signal = 0) {
+    exitHook.gracefulExit(signal);
+  }
 
+  init(opts: InitOptions) {
+    //console.log(process.argv);
+    this.#opts = opts;
+    if (opts.terminal) this.term.configure(opts.terminal);
+
+    globalThis.term = this.term;
+    this.term.appHeader();
+    this.#opts = opts;
+
+    exitHook.asyncExitHook((signal) => {
+      if (opts.onExit) opts.onExit(signal);
+      this.term.close();
+    }, { wait: 100 });
+
+    this.#initWithCommands(opts.commands);
+  }
+
+  #initWithCommands<T>(commands: Commands<T>) {
     const listCommands = () => {
       for (const entry of Object.entries(commands)) {
         this.term.log(` · ${ entry[ 0 ] }`);
       }
-      // eslint-disable-next-line unicorn/no-process-exit
-      process.exit();
+      exitHook.gracefulExit(0);
     }
+
     if (process.argv.length === 2) {
-      // No options provided
       this.term.log(`No command specified. Available commands:`);
       listCommands();
     }
@@ -38,8 +57,8 @@ export class App {
     });
 
     const argv = mainOptions._unknown || [];
-    console.log(`main options:`);
-    console.log(mainOptions);
+    // this.term.log(`main options:`);
+    // this.term.log(mainOptions);
 
     const c = commands[ mainOptions.command ];
     if (c === undefined) {

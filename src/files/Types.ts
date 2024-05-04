@@ -11,4 +11,10 @@ export type CrawlOptions = {
    * If true, only files are returned
    */
   ignoreDirectories?: boolean
+
+  /**
+   * Maximum recursion depth.
+   * 0 for no recursion.
+   */
+  maximumDepth?: number
 }
