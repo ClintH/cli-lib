@@ -1,5 +1,5 @@
 import { open, FileHandle } from "node:fs/promises";
-import { ILog, LogListener, LogMessage, LogOptions, RawConsole } from "./Types.js";
+import { ILog, LogListener, LogMessage, LogOptions, RawConsole } from "./types.js";
 
 export class Log implements ILog {
   private _verbose = false;

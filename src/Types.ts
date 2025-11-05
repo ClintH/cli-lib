@@ -1,6 +1,6 @@
 import { ArgumentConfig } from "ts-command-line-args"
-import { Commands, IBaseArguments } from "./Arguments.js"
-import { Term, TermOptions } from "./Term.js"
+import { Commands, IBaseArguments } from "./arguments.js"
+import { Term, TermOptions } from "./term.js"
 export type LogTypes = `` | `info` | `error` | `warning`;
 export type LogMessage = {
   type: LogTypes

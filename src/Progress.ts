@@ -1,6 +1,6 @@
 import kleur from "kleur";
-import { incrementThrough } from "./Arrays.js";
-import { humanElapsed } from "./Time.js";
+import { incrementThrough } from "./arrays.js";
+import { humanElapsed } from "./time.js";
 import logUpdate from 'log-update'
 
 const spinnerLines = [ `-`, `\\`, `|`, `/`, `-`, `\\`, `|`, `/` ] as const;

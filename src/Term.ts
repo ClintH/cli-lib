@@ -2,8 +2,8 @@ import boxen from 'boxen';
 import { readFileSync } from "node:fs";
 import kleur from "kleur";
 import { locatePackageJson } from './files/PackageJson.js';
-import { ILog, LogMessage, rawConsoleDefault, type RawConsole } from './Types.js';
-import * as Debug from './Debug.js';
+import { ILog, LogMessage, rawConsoleDefault, type RawConsole } from './types.js';
+import * as Debug from './debug.js';
 
 export type TermTypePrefixStyles = `character` | `word` | `none`;
 

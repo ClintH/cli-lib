@@ -1,8 +1,8 @@
-import { Commands } from "./Arguments.js";
-import { Term } from "./Term.js";
+import { Commands } from "./arguments.js";
+import { Term } from "./term.js";
 import { parse } from 'ts-command-line-args';
 import * as exitHook from 'exit-hook';
-import { InitOptions } from "Types.js";
+import { InitOptions } from "types.js";
 
 export class App {
   static _instance: App | undefined = undefined;

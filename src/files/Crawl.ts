@@ -32,7 +32,7 @@ export async function* crawl(basePath: string, opts: CrawlOptions = {}, depth = 
 
   const entries = await readdir(basePath, { withFileTypes: true });
   for (const entry of entries) {
-    entry.path = basePath;
+    entry.parentPath = basePath;
     if (entry.isDirectory()) {
       if (!ignoreDirectories) yield entry;
       yield* crawl(join(basePath, entry.name), opts, depth + 1);
