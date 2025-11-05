@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { splitFolderName } from './EnsurePath.js'
+import { splitFolderName } from './ensure-path.js'
 
 test(`splitFolderName`, t => {
 

@@ -1,8 +1,8 @@
 export * from './term.js';
-export * as Json from './files/Json.js';
+export * as Json from './files/json.js';
 export * as Arrays from './arrays.js';
 export * as Files from './files/index.js';
-export * from './ForgetfulMap.js';
+export * from './collections/forgetful-map.js';
 export * as Maths from './math.js';
 export * from './progress.js';
 export * as Time from './time.js';
@@ -10,7 +10,7 @@ export * as Debug from './debug.js';
 export * as Text from './text.js';
 export { App } from './app.js';
 export { Commands, Command } from './arguments.js';
-export type { InitOptions, LogListener, LogMessage, LogTypes, LogOptions } from './types.js'
+export type * from './types.js'
 // export function init<TArguments>(initOptions: Partial<InitOptions> = {}): App<TArguments> {
 //  const args = parseArguments<TArguments>(initOptions.args);
 // const args = parseCommand<TArguments>(options.args);

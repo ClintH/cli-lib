@@ -1,8 +1,16 @@
 import { Dirent } from 'node:fs';
 import { readdir } from 'node:fs/promises';
 import { isAbsolute, join, resolve } from 'node:path';
-import { CrawlOptions } from './Types.js';
+import { CrawlOptions } from './types.js';
 
+/**
+ * 
+ * Extensions need to have a '.' starting the string.
+ * @param basePath 
+ * @param opts 
+ * @param depth 
+ * @returns 
+ */
 export async function* crawl(basePath: string, opts: CrawlOptions = {}, depth = 0): AsyncIterableIterator<Dirent> {
   const ignoreExtensions = opts.ignoreExtensions ?? [];
   const includeExtensions = opts.includeExtensions ?? [];

@@ -1,7 +1,7 @@
 import boxen from 'boxen';
 import { readFileSync } from "node:fs";
 import kleur from "kleur";
-import { locatePackageJson } from './files/PackageJson.js';
+import { locatePackageJson } from './files/package-json.js';
 import { ILog, LogMessage, rawConsoleDefault, type RawConsole } from './types.js';
 import * as Debug from './debug.js';
 
