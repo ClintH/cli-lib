@@ -1,11 +1,8 @@
-import {readFile, writeFile} from "node:fs/promises"
-import {existsSync} from 'fs';
+import { readFile, writeFile } from "node:fs/promises"
+import { existsSync } from 'fs';
+import { Mode, OpenMode } from "node:fs";
 
-export enum WriteMode {
-  Overwrite,
-  NoOverwrite,
-  Append
-}
+export type WriteMode = `append` | `overwrite` | `dont-overwrite`
 
 export type ReadOpts<V> = {
   encoding?: BufferEncoding
@@ -32,14 +29,14 @@ export type WriteOpts = {
 
 export const writeJson = async (file: string, data: any, opts: WriteOpts = {}) => {
   const encoding = opts.encoding ?? 'utf8';
-  const mode = opts.mode ?? WriteMode.Overwrite;
+  const mode = opts.mode ?? `dont-overwrite`;
 
-  let modeFlag = '';
+  let modeFlag: OpenMode = '';
   switch (mode) {
-    case WriteMode.Append:
+    case `append`:
       modeFlag = 'a';
       break;
-    case WriteMode.Overwrite:
+    case `overwrite`:
       modeFlag = 'w';
       break;
     default:
@@ -47,8 +44,8 @@ export const writeJson = async (file: string, data: any, opts: WriteOpts = {}) =
   }
 
   const txt = JSON.stringify(data);
-  await writeFile(file, txt, {
+  return writeFile(file, txt, {
     encoding: encoding,
-    mode: modeFlag
+    flag: modeFlag
   })
 }

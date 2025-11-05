@@ -4,6 +4,7 @@ import { isAbsolute, join, resolve } from 'node:path';
 import { CrawlOptions } from './types.js';
 
 /**
+ * Recursive file system crawl
  * 
  * Extensions need to have a '.' starting the string.
  * @param basePath 

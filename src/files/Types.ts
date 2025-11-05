@@ -2,11 +2,11 @@ export type CrawlOptions = {
   /**
    * Files with extension, eg '.jpg' will be skipped 
    */
-  ignoreExtensions?: Array<string>
+  ignoreExtensions?: string[]
   /**
    * If used, only files with these extensions are included.
    */
-  includeExtensions?: Array<string>
+  includeExtensions?: string[]
   /**
    * If true, only files are returned
    */
